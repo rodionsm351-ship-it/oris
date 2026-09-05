@@ -38,7 +38,6 @@ class PlayList:
 
 playlist = PlayList()
 playlist.add_song("Song D", 200)
-playlist.add_song("Song D", 200)
 playlist.remove_song({"id": 2, "name": "Song B", "duration": 200})
 print(playlist.total_duration())
 print(playlist.len_playlist())
