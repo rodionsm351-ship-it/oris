@@ -1,10 +1,10 @@
-song_list = [
-    {"id": 1, "name": "Song A", "duration": 160},
-    {"id": 2, "name": "Song B", "duration": 200},
-    {"id": 3, "name": "Song C", "duration": 180}
-]
+class Playlist:
+    def __init__(self):
+        self.songs = []
 
-class PlayList:
+    def __len__(self):
+        return len(self.songs)
+
     def add_song(self, name, duration):
         if not isinstance(duration, (int, float)):
             raise ValueError("Продолжительность песни должна быть числом.")
@@ -15,30 +15,46 @@ class PlayList:
         if not isinstance(name, str):
             raise ValueError("Название песни должно быть строкой.")
         
-        song_list.append({"id": len(song_list) + 1, "name": name, "duration": duration})
+        self.songs.append({"id": len(self.songs) + 1, "name": name, "duration": duration})
 
-    def remove_song(self, song):
-        if song in song_list:
-            song_list.remove(song)
-        else:
-            raise ValueError("Песня не найдена в плейлисте.")
+    def remove_song(self, name):
+        for song in self.songs:
+            if song["name"] == name:
+                self.songs.remove(song)
+                return
+
+        print('Песня не найдена')  
 
     def total_duration(self):
         total_duration = 0
-        for song in song_list:
+        for song in self.songs:
             total_duration += song["duration"]
         return total_duration
 
-    def len_playlist(self):
-        return len(song_list)
-
     def show_playlist(self):
-        return song_list
+        return self.songs
 
 
-playlist = PlayList()
-playlist.add_song("Song D", 200)
-playlist.remove_song({"id": 2, "name": "Song B", "duration": 200})
-print(playlist.total_duration())
-print(playlist.len_playlist())
+playlist = Playlist()
+
+playlist.add_song("Song A", 100)
+playlist.add_song("Song B", 200)
+playlist.add_song("Song C", 300)
+
+print('До изменения плейлиста:')
 print(playlist.show_playlist())
+print(playlist.total_duration())
+print(len(playlist))
+
+
+playlist.remove_song("Song B")
+playlist.remove_song("Song X")
+
+print('После изменения плейлиста:')
+print(playlist.show_playlist())
+print(playlist.total_duration())
+print(len(playlist))
+
+empty_playlist = Playlist()
+print('Пустой плейлист:')
+print(empty_playlist.show_playlist())
