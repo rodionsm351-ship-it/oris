@@ -127,7 +127,9 @@ class TaskManager(QMainWindow):
 
     def check_task(self):
         if self.task_edit.text().strip() == '':
-            return "Введите название задачи"
+            return "Enter the task"
+        if len(self.description_field.toPlainText()) > 200:
+            return "Description is too long"
         return
 
 
