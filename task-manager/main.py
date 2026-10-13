@@ -72,7 +72,7 @@ class TaskManager(QMainWindow):
         cur_task_label = QLabel("Created task")
         self.cur_task_field = QTextEdit()
 
-        result_label = QLabel(f"Your tasks ({len(self.tasks)})")
+        self.result_label = QLabel(f"Your tasks ({len(self.tasks)})")
         self.result_field = QTextEdit()
 
         delete_button = QPushButton("Delete last task")
@@ -87,7 +87,7 @@ class TaskManager(QMainWindow):
         main_layout.addWidget(clean_button)
         main_layout.addWidget(cur_task_label)
         main_layout.addWidget(self.cur_task_field)
-        main_layout.addWidget(result_label)
+        main_layout.addWidget(self.result_label)
         main_layout.addWidget(self.result_field)
         main_layout.addWidget(delete_button)
         
@@ -140,6 +140,7 @@ class TaskManager(QMainWindow):
         response = "\n".join(lines)
         
         self.result_field.setText(response)
+        self.result_label.setText(f"Your tasks ({len(self.tasks)})")
 
 
     def clear_form(self):
