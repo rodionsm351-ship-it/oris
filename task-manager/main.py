@@ -50,16 +50,11 @@ class TaskManager(QMainWindow):
         button_layout = QHBoxLayout()
 
         priority_label = QLabel("Priority:")
-        self.low_button = QRadioButton("Low")
-        self.medium_button = QRadioButton("Medium")
-        self.high_button = QRadioButton("High")
-
-        self.low_button.setChecked(True)
+        self.priority_choice = QComboBox()
+        self.priority_choice.addItems(["Low", "Medium", "High"])
 
         button_layout.addWidget(priority_label)
-        button_layout.addWidget(self.low_button)
-        button_layout.addWidget(self.medium_button)
-        button_layout.addWidget(self.high_button)
+        button_layout.addWidget(self.priority_choice)
 
         settings_layout = QHBoxLayout()
 
@@ -176,12 +171,7 @@ class TaskManager(QMainWindow):
         task = self.task_edit.text().strip()
         description = self.description_field.toPlainText()
 
-        priority = "Low"
-
-        if self.medium_button.isChecked():
-            priority = "Medium"
-        elif self.high_button.isChecked():
-            priority = "High"
+        priority = self.priority_choice.currentText()
 
         new_task = {
             "title": task,
@@ -214,7 +204,7 @@ class TaskManager(QMainWindow):
         self.task_edit.clear()
         self.description_field.clear()
 
-        self.low_button.setChecked(True)
+        self.priority_choice.setCurrentIndex(0)
         self.important_check.setChecked(False)
         self.favorite_check.setChecked(False)
 
@@ -260,7 +250,7 @@ class TaskManager(QMainWindow):
         self.task_edit.clear()
         self.description_field.clear()
 
-        self.low_button.setChecked(True)
+        self.priority_choice.setCurrentIndex(0)
         self.important_check.setChecked(False)
         self.favorite_check.setChecked(False)
 
@@ -349,7 +339,7 @@ class AboutDialog(QDialog):
                         color: #FFFFFF;
                         font-size: 24px;
                     }
-                    
+
                 """)
 
 
