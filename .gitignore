@@ -1,1 +1,144 @@
 data.json
+
+# ==========================================
+# Byte-compiled / optimized / DLL files
+# ==========================================
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# ==========================================
+# Distribution / packaging
+# ==========================================
+bin/
+build/
+develop-eggs/
+dist/
+eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+# Usually these files are written by a python script from a template
+# before distilling into a bundle
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# ==========================================
+# Unit testing / coverage reports
+# ==========================================
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# ==========================================
+# Translations
+# ==========================================
+*.mo
+*.pot
+
+# ==========================================
+# Django stuff
+# ==========================================
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# ==========================================
+# Flask stuff
+# ==========================================
+instance/
+.webassets-cache
+
+# ==========================================
+# Scrapy stuff
+# ==========================================
+.scrapy
+
+# ==========================================
+# Sphinx documentation
+# ==========================================
+docs/_build/
+
+# ==========================================
+# Jupyter Notebooks
+# ==========================================
+.ipynb_checkpoints
+
+# ==========================================
+# IPython
+# ==========================================
+.ipython/
+
+# ==========================================
+# Linters, Type Checkers, and Formatters
+# ==========================================
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.pytype/
+.ruff_cache/
+.black
+.pycln
+
+# ==========================================
+# Environments & Credentials (NEVER COMMIT SECRETS)
+# ==========================================
+.env
+.envrc
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+poetry.lock  # Optional: commit if building applications, ignore if building libraries
+pdm.lock
+pixi/
+
+# ==========================================
+# IDEs and Editors (Alternative: use global gitignore)
+# ==========================================
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.spyderproject
+.ropeproject
+
+# ==========================================
+# OS generated files
+# ==========================================
+.DS_Store
+Thumbs.db
