@@ -27,7 +27,7 @@ class TaskManager(QMainWindow):
         self.tasks = []
 
         self.setWindowTitle("Task Manager")
-        self.resize(600, 600)
+        self.resize(600, 800)
 
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
@@ -70,18 +70,15 @@ class TaskManager(QMainWindow):
 
         create_button = QPushButton("Create task")
         clean_button = QPushButton("Clear the form")
+
         delete_last_button = QPushButton("Delete last task")
         delete_current_button = QPushButton("Delete selected task")
+
         clear_button = QPushButton("Clear list")
         about_button = QPushButton("About this project")
 
         deleted_buttons_layout.addWidget(delete_last_button)
         deleted_buttons_layout.addWidget(delete_current_button)
-
-
-        cur_task_label = QLabel("Created task")
-        self.cur_task_field = QTextEdit()
-        self.cur_task_field.setReadOnly(True)
 
 
         self.result_label = QLabel("Your tasks (0)")
@@ -101,9 +98,6 @@ class TaskManager(QMainWindow):
 
         main_layout.addWidget(create_button)
         main_layout.addWidget(clean_button)
-
-        main_layout.addWidget(cur_task_label)
-        main_layout.addWidget(self.cur_task_field)
 
         main_layout.addWidget(self.result_label)
         main_layout.addWidget(self.priority_filter)
@@ -152,7 +146,7 @@ class TaskManager(QMainWindow):
                 color: black;
                 border: none;
                 border-radius: 5px;
-                padding: 8px;
+                padding: 3px;
                 font-size: 14px;
             }
 
@@ -183,30 +177,7 @@ class TaskManager(QMainWindow):
 
         self.tasks.append(new_task)
 
-        other_settings = []
-
-        if new_task["important"]:
-            other_settings.append("Important")
-
-        if new_task["favorite"]:
-            other_settings.append("Favorite")
-
-        response = (
-            f"{task}\n"
-            f"{description}\n"
-            f"{priority}\n"
-            f"{other_settings}"
-        )
-
-        self.cur_task_field.setText(response)
-
-
-        self.task_edit.clear()
-        self.description_field.clear()
-
-        self.priority_choice.setCurrentIndex(0)
-        self.important_check.setChecked(False)
-        self.favorite_check.setChecked(False)
+        # self.clear_form()
 
     def check_task(self):
         if self.task_edit.text().strip() == "":
@@ -230,9 +201,11 @@ class TaskManager(QMainWindow):
             favorite = "*" if task["favorite"] else ""
 
             task_text = (
-                f"{idx}. {task['title']} "
-                f"[{task['priority']}] "
-                f"{importance} {favorite}"
+                f"{idx}.\n"
+                f"Name: {task['title']}\n"
+                f"[{task['priority']}]\n"
+                f"{importance} {favorite}\n"
+                f"Description: {task['description']}\n"
             )
 
             self.task_list.addItem(task_text)
@@ -254,13 +227,10 @@ class TaskManager(QMainWindow):
         self.important_check.setChecked(False)
         self.favorite_check.setChecked(False)
 
-        self.cur_task_field.clear()
-
     def delete_last_task(self):
         if self.tasks:
             self.tasks.pop()
             self.show_tasks()
-            self.cur_task_field.clear()
 
     def delete_current_task(self):
         selected_row = self.task_list.currentRow()
@@ -282,9 +252,11 @@ class TaskManager(QMainWindow):
                     importance = "(important)" if task["important"] else ""
                     favorite = "*" if task["favorite"] else ""
                     task_text = (
-                        f"{self.tasks.index(task) + 1}. {task['title']} "
-                        f"[{task['priority']}] "
-                        f"{importance} {favorite}"
+                        f"{self.tasks.index(task) + 1}.\n"
+                        f"Name: {task['title']}\n"
+                        f"[{task['priority']}]\n"
+                        f"{importance} {favorite}\n"
+                        f"Description: {task['description']}\n"
                     )
 
                     if task_text == selected_text:
@@ -294,7 +266,6 @@ class TaskManager(QMainWindow):
                 return
 
             self.show_tasks()
-            self.cur_task_field.clear()
 
     def confirm_clear_list(self):
         answer = QMessageBox.question(
@@ -309,7 +280,6 @@ class TaskManager(QMainWindow):
         if answer == QMessageBox.StandardButton.Yes:
             self.tasks.clear()
             self.show_tasks()
-            self.cur_task_field.clear()
 
     def show_about_window(self):
         dialog = AboutDialog()
