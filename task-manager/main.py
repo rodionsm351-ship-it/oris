@@ -13,6 +13,7 @@ from PyQt6.QtWidgets import (
     QCheckBox,
     QPushButton,
     QComboBox,
+    QListWidget,
     QMessageBox,
 )
 
@@ -69,10 +70,16 @@ class TaskManager(QMainWindow):
         settings_layout.addWidget(self.important_check)
         settings_layout.addWidget(self.favorite_check)
 
+        deleted_buttons_layout = QHBoxLayout()
+
         create_button = QPushButton("Create task")
         clean_button = QPushButton("Clear the form")
         delete_last_button = QPushButton("Delete last task")
+        delete_current_button = QPushButton("Delete selected task")
         clear_button = QPushButton("Clear list")
+
+        deleted_buttons_layout.addWidget(delete_last_button)
+        deleted_buttons_layout.addWidget(delete_current_button)
 
 
         cur_task_label = QLabel("Created task")
@@ -83,6 +90,7 @@ class TaskManager(QMainWindow):
         self.result_label = QLabel("Your tasks (0)")
         self.priority_filter = QComboBox()
         self.priority_filter.addItems(["All", "Low", "Medium", "High"])
+        self.task_list = QListWidget()
 
 
         main_layout.addLayout(task_layout)
@@ -104,6 +112,7 @@ class TaskManager(QMainWindow):
         main_layout.addWidget(self.priority_filter)
         main_layout.addWidget(self.task_list)
 
+        main_layout.addLayout(deleted_buttons_layout)
         main_layout.addWidget(clear_button)
 
 
@@ -112,6 +121,7 @@ class TaskManager(QMainWindow):
 
         clean_button.clicked.connect(self.clear_form)
         delete_last_button.clicked.connect(self.delete_last_task)
+        delete_current_button.clicked.connect(self.delete_current_task)
         clear_button.clicked.connect(self.confirm_clear_list)
 
         self.task_edit.textChanged.connect(self.update_char_count)
@@ -253,6 +263,40 @@ class TaskManager(QMainWindow):
     def delete_last_task(self):
         if self.tasks:
             self.tasks.pop()
+            self.show_tasks()
+            self.cur_task_field.clear()
+
+    def delete_current_task(self):
+        selected_row = self.task_list.currentRow()
+
+        if selected_row != -1:
+            answer = QMessageBox.warning(
+                self, 
+                "Delete task",
+                "Are you sure you want to delete this task?", 
+                QMessageBox.StandardButton.Yes |
+                QMessageBox.StandardButton.No,
+                QMessageBox.StandardButton.No
+                )
+            
+            if answer == QMessageBox.StandardButton.Yes:
+                selected_text = self.task_list.currentItem().text()
+
+                for task in self.tasks:
+                    importance = "(important)" if task["important"] else ""
+                    favorite = "*" if task["favorite"] else ""
+                    task_text = (
+                        f"{self.tasks.index(task) + 1}. {task['title']} "
+                        f"[{task['priority']}] "
+                        f"{importance} {favorite}"
+                    )
+
+                    if task_text == selected_text:
+                        self.tasks.remove(task)
+                        break
+            else:
+                return
+
             self.show_tasks()
             self.cur_task_field.clear()
 
