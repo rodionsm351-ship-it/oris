@@ -15,6 +15,7 @@ from PyQt6.QtWidgets import (
     QComboBox,
     QListWidget,
     QMessageBox,
+    QDialog,
 )
 
 app = QApplication(sys.argv)
@@ -77,6 +78,7 @@ class TaskManager(QMainWindow):
         delete_last_button = QPushButton("Delete last task")
         delete_current_button = QPushButton("Delete selected task")
         clear_button = QPushButton("Clear list")
+        about_button = QPushButton("About this project")
 
         deleted_buttons_layout.addWidget(delete_last_button)
         deleted_buttons_layout.addWidget(delete_current_button)
@@ -114,15 +116,19 @@ class TaskManager(QMainWindow):
 
         main_layout.addLayout(deleted_buttons_layout)
         main_layout.addWidget(clear_button)
+        main_layout.addWidget(about_button)
 
 
         create_button.clicked.connect(self.create_task)
         create_button.clicked.connect(self.show_tasks)
 
         clean_button.clicked.connect(self.clear_form)
+        clear_button.clicked.connect(self.confirm_clear_list)
+
         delete_last_button.clicked.connect(self.delete_last_task)
         delete_current_button.clicked.connect(self.delete_current_task)
-        clear_button.clicked.connect(self.confirm_clear_list)
+
+        about_button.clicked.connect(self.show_about_window)
 
         self.task_edit.textChanged.connect(self.update_char_count)
         self.priority_filter.currentTextChanged.connect(self.show_tasks)
@@ -314,6 +320,38 @@ class TaskManager(QMainWindow):
             self.tasks.clear()
             self.show_tasks()
             self.cur_task_field.clear()
+
+    def show_about_window(self):
+        dialog = AboutDialog()
+        dialog.exec()
+
+
+class AboutDialog(QDialog):
+    def __init__(self):
+        super().__init__()
+
+        self.setWindowTitle("About program")
+        self.resize(300, 250)
+
+        main_layout = QVBoxLayout(self)
+
+        title = QLabel("Task Manager")
+        description = QLabel("Use this app to conrol and manage your tasks")
+        version = QLabel("Version 2.0")
+
+        main_layout.addWidget(title)
+        main_layout.addWidget(description)
+        main_layout.addWidget(version)
+
+        self.setStyleSheet("""
+
+                    QLabel {
+                        color: #FFFFFF;
+                        font-size: 24px;
+                    }
+                    
+                """)
+
 
 
 window = TaskManager()
