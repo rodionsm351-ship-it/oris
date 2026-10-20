@@ -1,4 +1,6 @@
 import sys
+import json
+import os
 
 from PyQt6.QtWidgets import (
     QApplication,
@@ -25,6 +27,7 @@ class TaskManager(QMainWindow):
     def __init__(self):
         super().__init__()
         self.tasks = []
+
 
         self.setWindowTitle("Task Manager")
         self.resize(600, 800)
@@ -155,6 +158,8 @@ class TaskManager(QMainWindow):
             }
         """)
 
+        self.load_tasks()
+
     def create_task(self):
         error = self.check_task()
 
@@ -176,6 +181,7 @@ class TaskManager(QMainWindow):
         }
 
         self.tasks.append(new_task)
+        self.save_history()
 
         # self.clear_form()
 
@@ -231,6 +237,7 @@ class TaskManager(QMainWindow):
         if self.tasks:
             self.tasks.pop()
             self.show_tasks()
+            self.save_history()
 
     def delete_current_task(self):
         selected_row = self.task_list.currentRow()
@@ -265,6 +272,7 @@ class TaskManager(QMainWindow):
             else:
                 return
 
+            self.save_history()
             self.show_tasks()
 
     def confirm_clear_list(self):
@@ -280,10 +288,24 @@ class TaskManager(QMainWindow):
         if answer == QMessageBox.StandardButton.Yes:
             self.tasks.clear()
             self.show_tasks()
+            self.save_history()
 
     def show_about_window(self):
         dialog = AboutDialog()
         dialog.exec()
+
+    def save_history(self):
+        with open('data.json', 'w', encoding='utf-8') as f:
+            json.dump(self.tasks, f, ensure_ascii=False)
+
+    def load_tasks(self):
+        try:
+            with open('data.json', 'r', encoding='utf-8') as f:
+                self.tasks = json.load(f)
+        except FileNotFoundError:
+            self.tasks = []
+
+        self.show_tasks()
 
 
 class AboutDialog(QDialog):
