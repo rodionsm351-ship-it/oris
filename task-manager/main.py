@@ -76,12 +76,14 @@ class TaskManager(QMainWindow):
 
         delete_last_button = QPushButton("Delete last task")
         delete_current_button = QPushButton("Delete selected task")
+        edit_task_button = QPushButton("Edit selected task")
 
         clear_button = QPushButton("Clear list")
         about_button = QPushButton("About this project")
 
         deleted_buttons_layout.addWidget(delete_last_button)
         deleted_buttons_layout.addWidget(delete_current_button)
+        deleted_buttons_layout.addWidget(edit_task_button)
 
 
         self.result_label = QLabel("Your tasks (0)")
@@ -119,6 +121,7 @@ class TaskManager(QMainWindow):
 
         delete_last_button.clicked.connect(self.delete_last_task)
         delete_current_button.clicked.connect(self.delete_current_task)
+        edit_task_button.clicked.connect(self.edit_task)
 
         about_button.clicked.connect(self.show_about_window)
 
@@ -307,6 +310,33 @@ class TaskManager(QMainWindow):
 
         self.show_tasks()
 
+    def edit_task(self):
+        selected_row = self.task_list.currentRow()
+
+        if selected_row != -1:
+            selected_text = self.task_list.currentItem().text()
+            for task in self.tasks:
+                importance = "(important)" if task["important"] else ""
+                favorite = "*" if task["favorite"] else ""
+                task_text = (
+                    f"{self.tasks.index(task) + 1}.\n"
+                    f"Name: {task['title']}\n"
+                    f"[{task['priority']}]\n"
+                    f"{importance} {favorite}\n"
+                    f"Description: {task['description']}\n"
+                )
+                if task_text == selected_text:
+                    dialog = EditTaskDialog(task)
+                    if dialog.exec():
+                        edited_task = dialog.get_task_data()
+                        task.update(edited_task)
+
+                        self.save_history()
+                        self.show_tasks()
+                    break
+        else:
+            return
+
 
 class AboutDialog(QDialog):
     def __init__(self):
@@ -333,6 +363,88 @@ class AboutDialog(QDialog):
                     }
 
                 """)
+
+
+class EditTaskDialog(QDialog):
+    def __init__(self, task):
+        super().__init__()
+
+        self.title = task['title']
+        self.description = task['description']
+        self.priority = task['priority']
+        self.importance = task['important']
+        self.favorite = task['favorite']
+
+        self.setWindowTitle("Edit Task")
+        self.resize(500,450)
+
+        main_layout = QVBoxLayout(self)
+
+        task_layout = QHBoxLayout()
+        title = QLabel("Edit your task")
+        task_label = QLabel("Name")
+        self.task_edit = QLineEdit()
+        self.task_edit.setText(self.title)
+        task_layout.addWidget(task_label)
+        task_layout.addWidget(self.task_edit)
+
+        description_layout = QHBoxLayout()
+        description_label = QLabel("Description")
+        self.description_edit = QTextEdit()
+        self.description_edit.setPlainText(self.description)
+        description_layout.addWidget(description_label)
+        description_layout.addWidget(self.description_edit)
+
+        self.priority_edit_button = QComboBox()
+        self.priority_edit_button.addItems(["Low", "Medium", "High"])
+        self.priority_edit_button.setCurrentText(self.priority)
+
+        settings_label = QLabel("Parameters")
+        self.important_check = QCheckBox("Important")
+        self.favorite_check = QCheckBox("Add to favourite")
+        self.important_check.setChecked(self.importance)
+        self.favorite_check.setChecked(self.favorite)
+
+        buttons_layout = QHBoxLayout()
+        self.cancel_button = QPushButton("Cancel")
+        self.save_button = QPushButton("Save")
+        buttons_layout.addWidget(self.cancel_button)
+        buttons_layout.addWidget(self.save_button)
+
+        self.cancel_button.clicked.connect(self.cancel_edit_task)
+        self.save_button.clicked.connect(self.save_edit_task)
+
+        main_layout.addWidget(title)
+        main_layout.addLayout(task_layout)
+        main_layout.addLayout(description_layout)
+        main_layout.addWidget(self.priority_edit_button)
+        main_layout.addWidget(settings_label)
+        main_layout.addWidget(self.important_check)
+        main_layout.addWidget(self.favorite_check)
+        main_layout.addLayout(buttons_layout)
+
+    def cancel_edit_task(self):
+        self.reject()
+
+    def save_edit_task(self):
+        self.accept()
+
+    def get_task_data(self):
+        return {
+            "title": self.task_edit.text(),
+            "description": self.description_edit.toPlainText(),
+            "priority": self.priority_edit_button.currentText(),
+            "important": self.important_check.isChecked(),
+            "favorite": self.favorite_check.isChecked()
+        }
+
+
+
+
+
+
+
+
 
 
 
