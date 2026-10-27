@@ -15,6 +15,7 @@ from PyQt6.QtWidgets import (
     QTextEdit,
     QVBoxLayout,
     QWidget,
+    QMessageBox,
 )
 
 
@@ -58,6 +59,7 @@ class NetCom:
 
 class ReceiveThread(QThread):
     message_received = pyqtSignal(dict)
+    disconnected = pyqtSignal(str)
 
     def __init__(self, net):
         super().__init__()
@@ -65,9 +67,16 @@ class ReceiveThread(QThread):
 
     def run(self):
         while True:
-            message = self.net.recv()
-            if message is None:
+            try:
+                message = self.net.recv()
+            except OSError:
+                self.disconnected.emit("Connection to server lost")
                 break
+                            
+            if message is None or message == b'':
+                self.disconnected.emit("Connection to server closed")
+                break
+            
             self.message_received.emit(message)
 
 
@@ -131,6 +140,7 @@ class MainWindow(QMainWindow):
 
         self.receive_thread = ReceiveThread(self.net)
         self.receive_thread.message_received.connect(self.handle_message)
+        self.receive_thread.disconnected.connect(self.handle_disconnect)
         self.receive_thread.start()
 
         self.send_thread = SendThread(self.net)
@@ -176,6 +186,13 @@ class MainWindow(QMainWindow):
 
         else:
             return
+
+    def handle_disconnect(self, reason):
+            QMessageBox.warning(
+                self,
+                "Connection lost",
+                reason
+			)
 
 
 def main():
