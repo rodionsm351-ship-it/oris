@@ -439,15 +439,6 @@ class EditTaskDialog(QDialog):
         }
 
 
-
-
-
-
-
-
-
-
-
 window = TaskManager()
 window.show()
 
