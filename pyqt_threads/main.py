@@ -96,6 +96,9 @@ class SendThread(QThread):
                 break
 
             self.net.send(message)
+            
+    def stop(self):
+        self.queue.put(None)
 
 
 class MainWindow(QMainWindow):
@@ -193,6 +196,13 @@ class MainWindow(QMainWindow):
                 "Connection lost",
                 reason
 			)
+
+    def closeEvent(self, event):
+        print("Closing window")
+        self.send_thread.stop()
+        self.send_thread.wait()
+        print("SendThread stopped")
+        event.accept()
 
 
 def main():
