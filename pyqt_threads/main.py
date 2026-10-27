@@ -191,6 +191,7 @@ class MainWindow(QMainWindow):
             return
 
     def handle_disconnect(self, reason):
+            self.status_label.setText("Disconnected")
             QMessageBox.warning(
                 self,
                 "Connection lost",
