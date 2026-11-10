@@ -36,3 +36,6 @@ r = requests.post(url, json={"text": "Goodbye", "author": "Alla"})
 
 r = requests.get(url +"/authors")
 print(r.status_code, r.json())
+
+r = requests.delete(url + "?author=Bob")
+print(r.status_code, r.json())

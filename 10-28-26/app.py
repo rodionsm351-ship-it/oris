@@ -2,6 +2,7 @@ import itertools
 from flask import Flask, jsonify, request, abort
 
 app = Flask(__name__)
+app.json.sort_keys = False
 
 notes = []
 note_ids = itertools.count(1)
@@ -71,7 +72,6 @@ def list_authors():
     authors = sorted(authors, key=lambda author: author["author"])
 
     return jsonify(authors)
-
 
 @app.post("/notes")
 def create_note():
@@ -153,6 +153,23 @@ def delete_note(note_id):
         abort(404)
     notes.remove(note)
     return "", 204
+
+@app.delete("/notes")
+def delete_author_notes():
+    author = request.args.get("author")
+
+    deleted = 0
+
+    if author is not None:
+        for note in notes:
+            if note["author"] == author:
+                deleted += 1
+                notes.remove(note)
+
+    if author is None:
+        return jsonify(error="author parameter is required"), 400
+
+    return jsonify(deleted=deleted), 200
 
 
 @app.errorhandler(404)
