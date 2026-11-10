@@ -19,6 +19,9 @@ def list_notes_filtered():
     limit = request.args.get("limit")
     offset = request.args.get("offset")
 
+    sort_by = request.args.get("sort_by")
+    order_by = request.args.get("order_by")
+
     filtered_notes = notes
 
     if author is not None:
@@ -33,7 +36,48 @@ def list_notes_filtered():
     if limit is not None:
         filtered_notes = filtered_notes[:int(limit)]
 
+    if sort_by is not None:
+        if sort_by == "id":
+            filtered_notes = sorted(filtered_notes, key=lambda note: note["id"])
+        elif sort_by == "likes":
+            filtered_notes = sorted(filtered_notes, key=lambda note: note["likes"])
+        else:
+            return jsonify(error="invalid sort_by parameter"), 400
+
+    if order_by is not None:
+        if order_by == "desc":
+            filtered_notes = list(reversed(filtered_notes))
+        elif order_by == "asc":
+            pass
+        else:
+            return jsonify(error="invalid order_by parameter"), 400
+
     return jsonify(filtered_notes)
+
+# @app.get("/notes")
+# def list_notes_sorted():
+#     sort_by = request.args.get("sort_by")
+#     order_by = request.args.get("order_by")
+
+#     sorted_notes = notes
+
+#     if sort_by == "id":
+#         sorted_notes = sorted(sorted_notes, key=lambda note: note["id"])
+#     elif sort_by == "like":
+#         sorted_notes = sorted(sorted_notes, key=lambda note: note["likes"])
+#     else:
+#         return jsonify(error="invalid sort_by parameter"), 400
+
+#     if order_by == "desc":
+#         sorted_notes = list(reversed(sorted_notes))
+#     elif order_by == "asc":
+#         pass
+#     else:
+#         return jsonify(error="invalid order_by parameter"), 400
+    
+#     return jsonify(sorted_notes)
+
+
 
 @app.post("/notes")
 def create_note():

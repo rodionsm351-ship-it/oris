@@ -25,3 +25,6 @@ print(r.status_code, r.json())
 
 r = requests.post(url + "/1/like")
 print(r.status_code, r.json())
+
+r = requests.get(url + "?sort_by=id&order_by=asc")
+print(r.status_code, r.json())
