@@ -1,5 +1,6 @@
 import itertools
 from flask import Flask, jsonify, request, abort
+import json
 
 app = Flask(__name__)
 app.json.sort_keys = False
@@ -10,12 +11,28 @@ note_ids = itertools.count(1)
 def find_note(note_id):
     return next((n for n in notes if n["id"] == note_id), None)
 
+def load_notes():
+    try:
+        with open("notes.json", "r", encoding="utf-8") as f:
+            load_notes = json.load(f)
+            
+            max_id = max((note["id"] for note in load_notes), default=0)
+
+        return load_notes, max_id
+
+    except FileNotFoundError:
+        return [], 0
+
+def save_notes():
+    with open("notes.json", "w", encoding="utf-8") as f:
+        json.dump(notes, f, ensure_ascii=False, indent=4)
+
 @app.get("/")
 def index():
     return "<h1>Гостевая книга</h1>"
 
 @app.get("/notes")
-def list_notes_filtered():
+def list_notes():
     author = request.args.get("author")
     limit = request.args.get("limit")
     offset = request.args.get("offset")
@@ -23,7 +40,7 @@ def list_notes_filtered():
     sort_by = request.args.get("sort_by")
     order_by = request.args.get("order_by")
 
-    filtered_notes = notes
+    filtered_notes = notes.copy()
 
     if author is not None:
         filtered_notes = [
@@ -73,6 +90,13 @@ def list_authors():
 
     return jsonify(authors)
 
+@app.get("/notes/<int:note_id>")
+def get_note(note_id):
+    note = find_note(note_id)
+    if note is None:
+        abort(404)
+    return jsonify(note)
+
 @app.post("/notes")
 def create_note():
     data = request.get_json(silent=True)
@@ -83,7 +107,10 @@ def create_note():
         return jsonify(error="field 'author' must be a non-empty string"), 400
 
     note = {"id": next(note_ids), "author": data.get("author"), "text": data.get("text").strip(), "likes": 0}
+    
     notes.append(note)
+    save_notes()
+
     return jsonify(note), 201
 
 
@@ -103,6 +130,7 @@ def update_note(note_id):
     note["text"] = data["text"].strip()
     if "author" in data:
         note["author"] = data["author"].strip()
+    save_notes()
     return jsonify(note)
 
 
@@ -126,14 +154,7 @@ def patch_note(note_id):
             return jsonify(error="field 'author' must be a non-empty string"), 400
         note["author"] = data["author"].strip()
 
-    return jsonify(note)
-
-
-@app.get("/notes/<int:note_id>")
-def get_note(note_id):
-    note = find_note(note_id)
-    if note is None:
-        abort(404)
+    save_notes()
     return jsonify(note)
 
 
@@ -143,6 +164,7 @@ def like_note(note_id):
     if note is None:
         abort(404)
     note["likes"] += 1
+    save_notes()
     return jsonify(note)
 
 
@@ -152,7 +174,9 @@ def delete_note(note_id):
     if note is None:
         abort(404)
     notes.remove(note)
+    save_notes()
     return "", 204
+
 
 @app.delete("/notes")
 def delete_author_notes():
@@ -169,6 +193,7 @@ def delete_author_notes():
     if author is None:
         return jsonify(error="author parameter is required"), 400
 
+    save_notes()
     return jsonify(deleted=deleted), 200
 
 
@@ -183,4 +208,7 @@ def method_not_allowed(error):
 
 
 if __name__ == "__main__":
+    notes, max_id = load_notes()
+    note_ids = itertools.count(max_id + 1)
+
     app.run(debug=True)
