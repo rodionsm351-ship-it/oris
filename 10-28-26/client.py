@@ -22,3 +22,6 @@ print(r.status_code, r.json())
 
 r = requests.get(url + "?author=Иван&limit=1&offset=0")
 print(r.status_code, r.json())
+
+r = requests.post(url + "/1/like")
+print(r.status_code, r.json())

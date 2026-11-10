@@ -44,7 +44,7 @@ def create_note():
     if "author" in data and not isinstance(data["author"], str) or not data["author"].strip():
         return jsonify(error="field 'author' must be a non-empty string"), 400
 
-    note = {"id": next(note_ids), "author": data.get("author"), "text": data.get("text").strip()}
+    note = {"id": next(note_ids), "author": data.get("author"), "text": data.get("text").strip(), "likes": 0}
     notes.append(note)
     return jsonify(note), 201
 
@@ -93,6 +93,14 @@ def get_note(note_id):
     note = find_note(note_id)
     if note is None:
         abort(404)
+    return jsonify(note)
+
+@app.post("/notes/<int:note_id>/like")
+def like_note(note_id):
+    note = find_note(note_id)
+    if note is None:
+        abort(404)
+    note["likes"] += 1
     return jsonify(note)
 
 @app.delete("/notes/<int:note_id>")
