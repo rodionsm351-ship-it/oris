@@ -54,29 +54,23 @@ def list_notes_filtered():
 
     return jsonify(filtered_notes)
 
-# @app.get("/notes")
-# def list_notes_sorted():
-#     sort_by = request.args.get("sort_by")
-#     order_by = request.args.get("order_by")
+@app.get("/notes/authors")
+def list_authors():
+    authors = []
 
-#     sorted_notes = notes
+    for note in notes:
+        if note["author"] is not None and note["author"] not in [author["author"] for author in authors]:
+            authors.append({"author": note["author"], "notes": 1, "likes": note["likes"]})
+        elif note["author"] is not None:
+            for author in authors:
+                if author["author"] == note["author"]:
+                    author["notes"] += 1
+                    author["likes"] += note["likes"]
+                    break
+        
+    authors = sorted(authors, key=lambda author: author["author"])
 
-#     if sort_by == "id":
-#         sorted_notes = sorted(sorted_notes, key=lambda note: note["id"])
-#     elif sort_by == "like":
-#         sorted_notes = sorted(sorted_notes, key=lambda note: note["likes"])
-#     else:
-#         return jsonify(error="invalid sort_by parameter"), 400
-
-#     if order_by == "desc":
-#         sorted_notes = list(reversed(sorted_notes))
-#     elif order_by == "asc":
-#         pass
-#     else:
-#         return jsonify(error="invalid order_by parameter"), 400
-    
-#     return jsonify(sorted_notes)
-
+    return jsonify(authors)
 
 
 @app.post("/notes")
@@ -91,6 +85,7 @@ def create_note():
     note = {"id": next(note_ids), "author": data.get("author"), "text": data.get("text").strip(), "likes": 0}
     notes.append(note)
     return jsonify(note), 201
+
 
 @app.put("/notes/<int:note_id>")
 def update_note(note_id):
@@ -109,6 +104,7 @@ def update_note(note_id):
     if "author" in data:
         note["author"] = data["author"].strip()
     return jsonify(note)
+
 
 @app.patch("/notes/<int:note_id>")
 def patch_note(note_id):
@@ -132,12 +128,14 @@ def patch_note(note_id):
 
     return jsonify(note)
 
+
 @app.get("/notes/<int:note_id>")
 def get_note(note_id):
     note = find_note(note_id)
     if note is None:
         abort(404)
     return jsonify(note)
+
 
 @app.post("/notes/<int:note_id>/like")
 def like_note(note_id):
@@ -147,6 +145,7 @@ def like_note(note_id):
     note["likes"] += 1
     return jsonify(note)
 
+
 @app.delete("/notes/<int:note_id>")
 def delete_note(note_id):
     note = find_note(note_id)
@@ -155,13 +154,16 @@ def delete_note(note_id):
     notes.remove(note)
     return "", 204
 
+
 @app.errorhandler(404)
 def not_found(error):
     return jsonify(error="not found"), 404
 
+
 @app.errorhandler(405)
 def method_not_allowed(error):
     return jsonify(error="method not allowed"), 405
+
 
 if __name__ == "__main__":
     app.run(debug=True)
