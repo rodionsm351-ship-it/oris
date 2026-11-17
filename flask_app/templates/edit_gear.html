@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}
+Редактировать оборудование
+{% endblock %}
+
+{% block content %}
+
+<h2>Редактировать оборудование</h2>
+
+{% for error in errors|default([]) %}
+    <p>{{ error }}</p>
+{% endfor %}
+
+<form method="POST">
+    
+    <p>
+        <label>Название</label>
+        <input type="text" name="title" value="{{ title|default(gear.title) }}">
+    </p>
+
+    <p>
+        <label>Категория</label>
+        <input type="text" name="category" value="{{ category|default(gear.category) }}">
+    </p>
+
+    <p>
+        <label>Бренд</label>
+        <input type="text" name="brand" value="{{ brand|default(gear.brand) }}">
+    </p>
+
+    <p>
+        <label>Цена</label>
+        <input type="number" name="price" value="{{ price|default(gear.price) }}" step="0.01">
+    </p>
+
+    <p>
+        <label>Описание</label>
+        <textarea name="description">{{ description|default(gear.description) }}</textarea>
+    </p>
+
+    <button type="submit">Сохранить</button>
+</form>
+
+<a href="{{ url_for('gear_details', gear_id=gear.id) }}">Назад</a>
+
+{% endblock %}
