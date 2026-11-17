@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}
+Главная — GearCatalog
+{% endblock %}
+
+{% block content %}
+
+<h2>All Gears</h2>
+
+{% if gears %}
+
+    {% for gear in gears %}
+        <div>
+            <h3>{{ gear.title }}</h3>
+            <p>{{ gear.category }}</p>
+            <p>{{ gear.brand }}</p>
+            <p>{{ gear.price }}</p>
+            <a href="{{ url_for('gear_details', gear_id=gear.id) }}">Подробнее</a>
+        </div>
+        <hr>
+    {% endfor %}
+
+{% else %}
+    <p>Пока оборудования нет.</p>
+{% endif %}
+
+{% endblock %}
