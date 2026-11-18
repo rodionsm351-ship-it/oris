@@ -8,7 +8,7 @@ gears = [
         'title': 'Sony a6700',
         'category': 'Camera',
         'brand': 'Sony',
-        'price': 100.000,
+        'price': 100,
         'description': 'Описание Sony a6700'
     },
     {
@@ -16,14 +16,35 @@ gears = [
         'title': 'Canon EOS R5',
         'category': 'Camera',
         'brand': 'Canon',
-        'price': 200.000,
+        'price': 200,
         'description': 'Описание Canon EOS R5'
     }
 ]
 
 @app.route('/')
 def index():
-    return render_template('index.html', gears=gears)
+    search = request.args.get('search', '').lower()
+    category = request.args.get('category', '')
+    brand = request.args.get('brand', '')
+    sort_by = request.args.get('sort_by', '')
+    filter_gears = gears
+
+    if search:
+        filter_gears = [g for g in filter_gears if search in g['title'].lower() or search in g['description'].lower()]
+
+    if category:
+        filter_gears = [g for g in filter_gears if g['category'].lower() == category.lower()]
+
+    if brand:
+        filter_gears = [g for g in filter_gears if g['brand'].lower() == brand.lower()]
+
+    if sort_by == 'price_asc':
+        filter_gears.sort(key=lambda x: x['price'])
+
+    elif sort_by == 'price_desc':
+        filter_gears.sort(key=lambda x: x['price'], reverse=True)
+
+    return render_template('index.html', gears=filter_gears, search=search, category=category, brand=brand, sort_by=sort_by)
 
 
 @app.route('/gear/<int:gear_id>')
