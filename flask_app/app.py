@@ -1,36 +1,20 @@
 from flask import Flask, render_template, request, redirect, url_for
+import json
 
 app = Flask(__name__)
 
-gears = [
-    {
-        'id': 1,
-        'title': 'Sony a6700',
-        'category': 'Camera',
-        'brand': 'Sony',
-        'price': 100,
-        'description': 'Описание Sony a6700'
-    },
-    {
-        'id': 2,
-        'title': 'Canon EOS R5',
-        'category': 'Camera',
-        'brand': 'Canon',
-        'price': 200,
-        'description': 'Описание Canon EOS R5'
-    }
-]
+gears = []
 
 @app.route('/')
 def index():
-    search = request.args.get('search', '').lower()
+    search = request.args.get('search', '')
     category = request.args.get('category', '')
     brand = request.args.get('brand', '')
     sort_by = request.args.get('sort_by', '')
     filter_gears = gears
 
     if search:
-        filter_gears = [g for g in filter_gears if search in g['title'].lower() or search in g['description'].lower()]
+        filter_gears = [g for g in filter_gears if search.lower() in g['title'].lower() or search.lower() in g['description'].lower()]
 
     if category:
         filter_gears = [g for g in filter_gears if g['category'].lower() == category.lower()]
@@ -92,6 +76,7 @@ def add_gear():
         }
 
         gears.append(new_gear)
+        save_gears_to_json()
         return redirect(url_for('index'))
 
     return render_template('add_gear.html')
@@ -133,6 +118,7 @@ def edit_gear(gear_id):
             'price': price,
             'description': description
         })
+        save_gears_to_json()
 
         return redirect(url_for('gear_details', gear_id=gear['id']))
 
@@ -142,6 +128,18 @@ def edit_gear(gear_id):
 def find_gear(gear_id):
     return next((g for g in gears if g['id'] == gear_id), None)
 
+def load_gears_from_json():
+    try:
+        with open('data.json', 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return []
+
+def save_gears_to_json():
+    with open('data.json', 'w', encoding='utf-8') as f:
+        json.dump(gears, f, ensure_ascii=False, indent=4)
+
 
 if __name__ == '__main__':
+    gears = load_gears_from_json()
     app.run(debug=True)
