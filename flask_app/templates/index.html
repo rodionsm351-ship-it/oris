@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}
+Главная — GearCatalog
+{% endblock %}
+
+{% block content %}
+
+<h2>All Gears</h2>
+
+<form method="GET" action="{{ url_for('index') }}">
+    <input
+    type="text"
+    name="search"
+    value="{{ search }}"
+    placeholder="Search..."
+>
+
+    <select name="category">
+
+        <option value="">All categories</option>
+
+        <option value="camera"
+            {% if category == "camera" %}selected{% endif %}>
+            Camera
+        </option>
+
+    </select>
+
+    <select name="brand">
+        <option value="">All brands</option>
+
+        <option value="Sony"
+            {% if brand == 'Sony' %} selected{% endif %}>
+            Sony
+        </option>
+
+        <option value="Canon"
+            {% if brand == 'Canon' %} selected{% endif %}>
+            Canon
+        </option>
+
+        <option value="Other"
+            {% if brand == 'Other' %} selected{% endif %}>
+            Other
+        </option>
+
+    </select>
+
+    <select name="sort_by">
+        <option value="">Sort by</option>
+
+        <option value="price_asc"
+            {% if sort_by == 'price_asc' %} selected{% endif %}>
+            Price: Low to High
+        </option>
+
+        <option value="price_desc"
+            {% if sort_by == 'price_desc' %} selected{% endif %}>
+            Price: High to Low
+        </option>
+    </select>
+
+    <button type="submit">Search</button>
+</form>
+
+{% if gears %}
+
+    {% for gear in gears %}
+        <div>
+            <h3>{{ gear.title }}</h3>
+            <p>{{ gear.category }}</p>
+            <p>{{ gear.brand }}</p>
+            <p>{{ gear.price }}</p>
+            <a href="{{ url_for('gear_details', gear_id=gear.id) }}">Подробнее</a>
+        </div>
+        <hr>
+    {% endfor %}
+
+{% else %}
+    <p>Пока оборудования нет.</p>
+{% endif %}
+
+{% endblock %}

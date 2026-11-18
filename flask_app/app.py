@@ -1,0 +1,145 @@
+from flask import Flask, render_template, request, redirect, url_for
+import json
+
+app = Flask(__name__)
+
+gears = []
+
+@app.route('/')
+def index():
+    search = request.args.get('search', '')
+    category = request.args.get('category', '')
+    brand = request.args.get('brand', '')
+    sort_by = request.args.get('sort_by', '')
+    filter_gears = gears
+
+    if search:
+        filter_gears = [g for g in filter_gears if search.lower() in g['title'].lower() or search.lower() in g['description'].lower()]
+
+    if category:
+        filter_gears = [g for g in filter_gears if g['category'].lower() == category.lower()]
+
+    if brand:
+        filter_gears = [g for g in filter_gears if g['brand'].lower() == brand.lower()]
+
+    if sort_by == 'price_asc':
+        filter_gears.sort(key=lambda x: x['price'])
+
+    elif sort_by == 'price_desc':
+        filter_gears.sort(key=lambda x: x['price'], reverse=True)
+
+    return render_template('index.html', gears=filter_gears, search=search, category=category, brand=brand, sort_by=sort_by)
+
+
+@app.route('/gear/<int:gear_id>')
+def gear_details(gear_id):
+    gear = find_gear(gear_id)
+    if gear:
+        return render_template('gear_details.html', gear=gear)
+    else:
+        return "Gear not found", 404
+
+
+@app.route('/gear/add', methods=['GET', 'POST'])
+def add_gear():
+    if request.method == 'POST':
+        title = request.form.get('title', '')
+        category = request.form.get('category', '')
+        brand = request.form.get('brand', '')
+        price = request.form.get('price', '')
+        description = request.form.get('description', '').strip()
+
+        errors = []
+
+        if not title:
+            errors.append("Title is required")
+
+        if not category:
+            errors.append("Category is required")
+
+        if not brand:
+            errors.append("Brand is required")
+
+        if not price:
+            errors.append("Price is required")
+
+        if errors:
+            return render_template('add_gear.html', errors=errors, title=title, category=category, brand=brand, price=price, description=description)
+
+        new_gear = {
+            'id': len(gears) + 1,
+            'title': title,
+            'category': category,
+            'brand': brand,
+            'price': price,
+            'description': description
+        }
+
+        gears.append(new_gear)
+        save_gears_to_json()
+        return redirect(url_for('index'))
+
+    return render_template('add_gear.html')
+
+@app.route('/gear/<int:gear_id>/edit', methods=['GET', 'POST'])
+def edit_gear(gear_id):
+    gear = find_gear(gear_id)
+    if not gear:
+        return "Gear not found", 404
+
+    if request.method == 'POST':
+        title = request.form.get('title', '').strip()
+        category = request.form.get('category', '').strip()
+        brand = request.form.get('brand', '').strip()
+        price = request.form.get('price', '').strip()
+        description = request.form.get('description', '').strip()
+
+        errors = []
+
+        if not title:
+            errors.append("Title is required")
+
+        if not category:
+            errors.append("Category is required")
+
+        if not brand:
+            errors.append("Brand is required")
+
+        if not price:
+            errors.append("Price is required")
+
+        if errors:
+            return render_template('edit_gear.html', errors=errors, title=title, category=category, brand=brand, price=price, description=description, gear=gear)
+
+        gear.update({
+            'title': title,
+            'category': category,
+            'brand': brand,
+            'price': price,
+            'description': description
+        })
+        save_gears_to_json()
+
+        return redirect(url_for('gear_details', gear_id=gear['id']))
+
+    return render_template('edit_gear.html', gear=gear)
+
+
+def find_gear(gear_id):
+    return next((g for g in gears if g['id'] == gear_id), None)
+
+def load_gears_from_json():
+    try:
+        with open('data.json', 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return []
+
+def save_gears_to_json():
+    with open('data.json', 'w', encoding='utf-8') as f:
+        json.dump(gears, f, ensure_ascii=False, indent=4)
+
+
+if __name__ == '__main__':
+    gears = load_gears_from_json()
+    app.run(debug=True)

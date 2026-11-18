@@ -1,0 +1,26 @@
+[
+    {
+        "id": 1,
+        "title": "Sony a6600",
+        "category": "Camera",
+        "brand": "Sony",
+        "price": "78000",
+        "description": ""
+    },
+    {
+        "id": 2,
+        "title": "Sony a6700",
+        "category": "Camera",
+        "brand": "Sony",
+        "price": "85000",
+        "description": "Описание сони"
+    },
+    {
+        "id": 3,
+        "title": "Canon EOS50",
+        "category": "Camera",
+        "brand": "Canon",
+        "price": "100000",
+        "description": "Описание"
+    }
+]

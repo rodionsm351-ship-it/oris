@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ gear.title }}
+{% endblock %}
+
+{% block content %}
+
+<h2>{{ gear.title }}</h2>
+
+<p>{{ gear.category }}</p>
+<p>{{ gear.brand }}</p>
+<p>{{ gear.price }}</p>
+<p>{{ gear.description }}</p>
+
+<a href="{{ url_for('index') }}">Назад</a>
+<a href="{{ url_for('edit_gear', gear_id=gear.id) }}">Редактировать</a>
+
+{% endblock %}
